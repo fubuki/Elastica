@@ -23,4 +23,9 @@ class Completion extends AbstractSuggest
     {
         return $this->setParam('fuzzy', $fuzzy);
     }
+
+    public function setContext(array $category)
+    {
+        return $this->setParam('context', $category);
+    }
 }

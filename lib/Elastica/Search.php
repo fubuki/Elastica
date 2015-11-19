@@ -418,6 +418,10 @@ class Search
             $path .= '/'.implode(',', $types);
         }
 
+        if(isset($this->_options[self::OPTION_SEARCH_TYPE_SUGGEST])) {
+            return $path.= '/_suggest';
+        }
+
         // Add full path based on indices and types -> could be all
         return $path.'/_search';
     }
@@ -452,6 +456,29 @@ class Search
         $response = $this->getClient()->request(
             $path,
             Request::GET,
+            $data,
+            $params
+        );
+
+        return ResultSet::create($response, $query);
+    }
+
+    public function suggest($query = '', $options = null)
+    {
+        $this->setOptionsAndQuery($options, $query);
+
+        $query = $this->getQuery();
+        $path = $this->getPath();
+
+        $params = $this->getOptions();
+
+        // Send scroll_id via raw HTTP body to handle cases of very large (> 4kb) ids.
+        $data = $query->toArray();
+        $data = $data['suggest'];
+
+        $response = $this->getClient()->request(
+            $path,
+            Request::POST,
             $data,
             $params
         );
